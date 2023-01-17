@@ -1,0 +1,16 @@
+/websocket_test/gradle-wrapper.jar
+/websocket_test/.gradle
+/websocket_test/captures/
+/websocket_test/gradlew
+/websocket_test/gradlew.bat
+/websocket_test/local.properties
+/websocket_test/GeneratedPluginRegistrant.java
+
+# Remember to never publicly share your keystore.
+# See https://flutter.dev/docs/deployment/android#reference-the-keystore-from-the-app
+/websocket_test/key.properties
+/websocket_test/**/*.keystore
+/wetsocket_test/**/*.jks
+
+/JavalinTest/.idea/
+/JavalinTest/target/
