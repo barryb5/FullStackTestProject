@@ -57,8 +57,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: EdgeInsets.all(8),
                       scrollDirection: Axis.vertical,
                       itemBuilder: (context, index) => ListTile(
-                          leading: const Icon(Icons.list),
-                          title: Text(messages[index]["message"])
+                          leading: const Icon(Icons.person),
+                          title: Text('${messages[index]["username"]}: ${messages[index]["message"]}')
                       ),
                     ),
                   );
