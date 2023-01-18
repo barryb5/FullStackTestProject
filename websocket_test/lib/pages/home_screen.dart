@@ -12,82 +12,62 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final Map<int, dynamic> messages = HashMap();
+  final Map<int, dynamic> chats = HashMap();
   final TextEditingController _controller = TextEditingController();
   final _channel = WebSocketChannel.connect(
-    Uri.parse('ws://localhost:4000/chat'),
+    Uri.parse('ws://localhost:4000/getChats'),
   );
-
-  void _sendMessage() {
-    if (_controller.text.isNotEmpty) {
-      _channel.sink.add(_controller.text);
-    }
-  }
-
-  @override
-  void dispose() {
-    _channel.sink.close();
-    _controller.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Test Chat"),
+        title: Text("Home Screen"),
+        actions: <Widget>[
+          Padding(
+          padding: EdgeInsets.only(right: 20.0),
+            child: GestureDetector(
+              onTap: () {
+              },
+              child: Icon(
+                Icons.plus_one,
+                size: 26.0,
+              ),
+            )
+          ),
+        ]
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            StreamBuilder(
+      body: Column(
+        children: [
+          Text("Chats"),
+          StreamBuilder(
               stream: _channel.stream,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   dynamic data = jsonDecode(snapshot.data);
-                  messages.addAll({messages.length: data});
+                  chats.addAll({chats.length: data});
                 }
 
-                if (messages.length > 0) {
+                if (chats.length > 0) {
                   return Expanded(
                     child: ListView.builder(
-                      itemCount: messages.length,
+                      itemCount: chats.length,
                       padding: EdgeInsets.all(8),
                       scrollDirection: Axis.vertical,
-                      itemBuilder: (context, index) => ListTile(
-                          leading: const Icon(Icons.person),
-                          title: Text('${messages[index]["username"]}: ${messages[index]["message"]}')
+                      itemBuilder: (context, index) => TextButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, 'chat');
+                          },
+                        child: Text("Chat name here"),
                       ),
                     ),
                   );
                 } else {
-                  return Text("No messages");
+                  return Text("No chats joined");
                 }
               }
-            ),
-            SizedBox(height: 24,),
-            Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Expanded(child: Form(
-                    child: TextFormField(
-                      controller: _controller,
-                      decoration: const InputDecoration(labelText: 'Send a message'),
-                    ),
-                  )),
-                  FloatingActionButton(
-                    onPressed: _sendMessage,
-                    tooltip: 'Send Message',
-                    child: const Icon(Icons.send),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        )
+          ),
+        ],
       ),
     );
   }

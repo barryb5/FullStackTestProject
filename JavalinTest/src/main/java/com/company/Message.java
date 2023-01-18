@@ -7,16 +7,16 @@ public class Message {
         this.username = username;
         this.message = message;
     }
-    void setMessage(String message) {
+    public void setMessage(String message) {
             this.message = message;
     }
-    void setUsername(String username) {
+    public void setUsername(String username) {
         this.username = username;
     }
-    String getUsername() {
+    public String getUsername() {
         return username;
     }
-    String getMessage() {
+    public String getMessage() {
         return message;
     }
 
