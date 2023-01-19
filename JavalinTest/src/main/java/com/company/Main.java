@@ -30,7 +30,7 @@ public class Main
         });
 
 
-        app.ws("/chat", ws -> Controller.chatHandler(ws));
+        app.ws("/chat/{chatName}", ws -> Controller.chatHandler(ws));
 
         app.ws("/getChats", ws -> Controller.getChats(ws));
     }

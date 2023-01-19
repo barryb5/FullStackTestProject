@@ -42,7 +42,7 @@ public class Controller {
         System.out.println("Stream Websocket Online");
         ws.onConnect(ctx -> {
             System.out.println("New Listener Joined");
-//            broadcastMessage("Server", ("Another user is listening"), MessageType.SERVER_UPDATE);
+            broadcastMessage("Server", ("Another user is listening"), MessageType.SERVER_UPDATE);
         });
     }
 
