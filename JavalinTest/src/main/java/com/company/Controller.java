@@ -39,10 +39,13 @@ public class Controller {
     }
 
     public static void getChats(WsConfig ws) {
-        System.out.println("Stream Websocket Online");
+        System.out.println("GetChats Websocket Online");
         ws.onConnect(ctx -> {
-            System.out.println("New Listener Joined");
+            System.out.println("New getChats Joined");
             broadcastMessage("Server", ("Another user is listening"), MessageType.SERVER_UPDATE);
+        });
+        ws.onMessage(ctx -> {
+            System.out.println("Requested chat: " + ctx.message());
         });
     }
 

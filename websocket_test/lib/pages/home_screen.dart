@@ -16,44 +16,65 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final Map<int, Chat> chats = HashMap();
   final TextEditingController _controller = TextEditingController();
+  bool typing = false;
   final _channel = WebSocketChannel.connect(
     Uri.parse('ws://localhost:4000/getChats'),
   );
 
+  void _sendMessage() {
+    if (_controller.text.isNotEmpty) {
+      _channel.sink.add(_controller.text);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    _channel.stream.listen(
-          (dynamic message) {
-        debugPrint('message $message');
-      },
-      onDone: () {
-        debugPrint('ws channel closed');
-      },
-      onError: (error) {
-        debugPrint('ws error $error');
-      },
-    );
+    // _channel.stream.listen(
+    //       (dynamic message) {
+    //     debugPrint('message $message');
+    //     setState(() {
+    //       typing = false;
+    //     });
+    //   },
+    //   onDone: () {
+    //     debugPrint('ws channel closed');
+    //   },
+    //   onError: (error) {
+    //     debugPrint('ws error $error');
+    //   },
+    // );
 
     return Scaffold(
       appBar: AppBar(
         title: Text("Home Screen"),
-        actions: <Widget>[
-          Padding(
-          padding: EdgeInsets.only(right: 20.0),
-            child: GestureDetector(
-              onTap: () {
-                chats.addAll({chats.length: Chat(0, "name")});
-              },
-              child: Icon(
-                Icons.plus_one,
-                size: 26.0,
-              ),
-            )
+          leading: IconButton(
+            icon: Icon(typing ? Icons.done : Icons.search),
+            onPressed: () {
+              _sendMessage();
+              setState(() {
+                typing = true;
+              });
+            },
           ),
+          actions: <Widget>[
+
         ]
       ),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _controller,
+              decoration: InputDecoration(
+                  enabledBorder: const OutlineInputBorder(
+                    // width: 0.0 produces a thin "hairline" border
+                    borderSide: const BorderSide(color: Colors.grey, width: 0.0),
+                  ),
+                  hintText: 'Search with chatId'
+              ),
+            ),
+          ),
           Text("Chats"),
           StreamBuilder(
               stream: _channel.stream,
