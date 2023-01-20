@@ -63,4 +63,30 @@ public class DatabaseManager {
             System.exit(0);
         }
     }
+
+    public void getChats() {
+        try {
+            Statement statement = db.createStatement();
+            statement.setQueryTimeout(30);  // set timeout to 30 sec.
+
+            statement.executeQuery("SELECT * FROM chats");
+        } catch (SQLException e) {
+            System.out.println("Get Chats Error");
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+    }
+
+    public void getMessages(String chatID) {
+        try {
+            Statement statement = db.createStatement();
+            statement.setQueryTimeout(30);  // set timeout to 30 sec.
+
+            statement.executeQuery(String.format("SELECT * FROM messages WHERE chatID = '%s'", chatID));
+        } catch (SQLException e) {
+            System.out.println("Get Chats Error");
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+    }
 }

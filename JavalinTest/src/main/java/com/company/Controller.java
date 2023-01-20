@@ -18,11 +18,13 @@ public class Controller {
     private static int nextUserNumber = 1;
     private static final Map<WsContext, String> userUsernameMap = new ConcurrentHashMap<>();
     private static ObjectMapper mapper = new ObjectMapper();
+    private DatabaseManager manager;
 
-    private Controller() {
+    Controller() {
         mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        manager = new DatabaseManager();
     }
-    public static void chatHandler(WsConfig ws) {
+    public void chatHandler(WsConfig ws) {
         System.out.println("Chat Websocket Online");
         ws.onConnect(ctx -> {
             String username = "User" + nextUserNumber++;
@@ -38,15 +40,23 @@ public class Controller {
         });
     }
 
-    public static void getChats(WsConfig ws) {
+    public void getChats(WsConfig ws) {
         System.out.println("GetChats Websocket Online");
         ws.onConnect(ctx -> {
             System.out.println("New getChats Joined");
             broadcastMessage("Server", ("Another user is listening"), MessageType.SERVER_UPDATE);
         });
         ws.onMessage(ctx -> {
-            System.out.println("Requested chat: " + ctx.message());
+            if (null != ctx.pathParam("chatID")) {
+                manager.getMessages(ctx.pathParam("chatID"));
+            } else {
+                manager.getChats();
+            }
         });
+    }
+
+    public void getMessages() {
+
     }
 
     private static void broadcastMessage(String sender, String message, MessageType type) {
