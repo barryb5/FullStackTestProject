@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:websocket_test/services/chat_screen_arguments.dart';
 
 import '../services/chat.dart';
 
@@ -24,25 +25,13 @@ class _HomeScreenState extends State<HomeScreen> {
   void _sendMessage() {
     if (_controller.text.isNotEmpty) {
       _channel.sink.add(_controller.text);
+    } else {
+      _channel.sink.add("getChatList");
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // _channel.stream.listen(
-    //       (dynamic message) {
-    //     debugPrint('message $message');
-    //     setState(() {
-    //       typing = false;
-    //     });
-    //   },
-    //   onDone: () {
-    //     debugPrint('ws channel closed');
-    //   },
-    //   onError: (error) {
-    //     debugPrint('ws error $error');
-    //   },
-    // );
 
     return Scaffold(
       appBar: AppBar(
@@ -81,7 +70,9 @@ class _HomeScreenState extends State<HomeScreen> {
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   dynamic data = jsonDecode(snapshot.data);
+                  print(snapshot.toString());
                   chats.addAll({chats.length: data});
+                  setState(() {});
                 }
 
                 if (chats.length > 0) {
@@ -93,9 +84,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemBuilder: (context, index) => TextButton(
                           onPressed: () {
                             _channel.sink.close(1000, 'CLOSE_NORMAL');
-                            Navigator.pushNamed(context, 'chat');
+                            Navigator.pushNamed(context, 'chat', arguments: ChatScreenArguments(chats[index]!.name));
                           },
-                        child: Text("Chat name here"),
+                        child: Text(chats[index]!.name),
                       ),
                     ),
                   );

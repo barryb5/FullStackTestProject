@@ -29,12 +29,7 @@ public class Main
 
         app.ws("/chat/{chatName}", ws -> controller.chatHandler(ws));
 
-        app.ws("/getChats/{chatID}", ws -> controller.getChats(ws));
-
-        DatabaseManager manager = new DatabaseManager();
-        manager.resetDatabase();
-        manager.addChat("test1");
-        manager.addMessage("test1", "asdf", "text message");
+        app.ws("/getChats", ws -> controller.getChats(ws));
 
     }
 }

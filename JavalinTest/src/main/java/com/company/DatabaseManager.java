@@ -9,6 +9,8 @@ public class DatabaseManager {
     DatabaseManager() {
         try {
             db = DriverManager.getConnection("jdbc:sqlite:test.db");
+            resetDatabase();
+            addChat("test1");
         } catch ( Exception e ) {
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
             System.exit(0);
@@ -28,7 +30,7 @@ public class DatabaseManager {
 
             statement.execute("CREATE TABLE chats (id TEXT ONLY PRIMARY KEY)");
 
-            statement.execute("CREATE TABLE messages (id INTEGER PRIMARY KEY, chatID TEXT ONLY NOT NULL, message TEXT ONLY, date TEXT ONLY, FOREIGN KEY(chatID) REFERENCES chats(id))");
+            statement.execute("CREATE TABLE messages (id INTEGER IDENTITY PRIMARY KEY, chatID TEXT ONLY NOT NULL, message TEXT ONLY, date TEXT ONLY, FOREIGN KEY(chatID) REFERENCES chats(id))");
 
             statement.execute("PRAGMA foreign_keys = 1");
 
@@ -43,7 +45,7 @@ public class DatabaseManager {
             Statement statement = db.createStatement();
             statement.setQueryTimeout(30);  // set timeout to 30 sec.
 
-            statement.executeUpdate(String.format("INSERT INTO chats VALUES('%s', '%s', '%s')", chatID, date, message));
+            statement.executeUpdate(String.format("INSERT INTO messages VALUES('%s', '%s', '%s')", chatID, date, message));
         } catch (SQLException e) {
             System.out.println("Insert chat error");
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
@@ -64,29 +66,31 @@ public class DatabaseManager {
         }
     }
 
-    public void getChats() {
+    public ResultSet getChats() {
         try {
             Statement statement = db.createStatement();
             statement.setQueryTimeout(30);  // set timeout to 30 sec.
 
-            statement.executeQuery("SELECT * FROM chats");
+            return statement.executeQuery("SELECT * FROM chats");
         } catch (SQLException e) {
             System.out.println("Get Chats Error");
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
             System.exit(0);
         }
+        return null;
     }
 
-    public void getMessages(String chatID) {
+    public ResultSet getMessages(String chatID) {
         try {
             Statement statement = db.createStatement();
             statement.setQueryTimeout(30);  // set timeout to 30 sec.
 
-            statement.executeQuery(String.format("SELECT * FROM messages WHERE chatID = '%s'", chatID));
+            return statement.executeQuery(String.format("SELECT * FROM messages WHERE chatID = '%s'", chatID));
         } catch (SQLException e) {
             System.out.println("Get Chats Error");
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
             System.exit(0);
         }
+        return null;
     }
 }

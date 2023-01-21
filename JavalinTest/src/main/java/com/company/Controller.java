@@ -7,12 +7,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.http.Context;
 import io.javalin.websocket.WsConfig;
 import io.javalin.websocket.WsContext;
-
+import io.javalin.websocket.*;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.lang.constant.Constable;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 
 public class Controller {
     private static int nextUserNumber = 1;
@@ -44,13 +55,13 @@ public class Controller {
         System.out.println("GetChats Websocket Online");
         ws.onConnect(ctx -> {
             System.out.println("New getChats Joined");
-            broadcastMessage("Server", ("Another user is listening"), MessageType.SERVER_UPDATE);
+//            broadcastMessage("Server", ("Another user is listening"), MessageType.SERVER_UPDATE);
         });
-        ws.onMessage(ctx -> {
-            if (null != ctx.pathParam("chatID")) {
-                manager.getMessages(ctx.pathParam("chatID"));
+        ws.onMessage((ctx) -> {
+            if (ctx.message().equalsIgnoreCase("getChatList")) {
+                ctx.send(createJsonResultSetFromServer(manager.getChats()));
             } else {
-                manager.getChats();
+                ctx.send(createJsonResultSetFromServer(manager.getMessages(ctx.message())));
             }
         });
     }
@@ -78,6 +89,21 @@ public class Controller {
 
     private static String createJsonMessageFromServer(String sender, String message) throws JsonProcessingException {
         return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(new Message(sender, message));
+    }
+    private static JSONArray createJsonResultSetFromServer(ResultSet results) throws JsonProcessingException, SQLException {
+        JSONArray json = new JSONArray();
+        ResultSetMetaData rsmd = results.getMetaData();
+        while(results.next()) {
+            int numColumns = rsmd.getColumnCount();
+            JSONObject obj = new JSONObject();
+            for (int i=1; i<=numColumns; i++) {
+                String column_name = rsmd.getColumnName(i);
+                obj.put(column_name, results.getObject(column_name));
+            }
+            json.put(obj);
+        }
+        System.out.println(json);
+        return json;
     }
     private static String createJsonMessageFromSender(String sender, String message) throws JsonProcessingException {
         return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(new Message(sender, message));
